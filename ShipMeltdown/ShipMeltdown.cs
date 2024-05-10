@@ -5,13 +5,17 @@ using BepInEx.Logging;
 using HarmonyLib;
 using OpenMonitors.Monitors;
 using ShipMeltdown.Patches;
+using ShipMeltdown.Utils;
+using ShipMeltdown.Utils.Monitors;
 using TMPro;
+using UnityEngine;
 
 namespace ShipMeltdown;
 
 [BepInPlugin(modGUID, modName, modVersion)]
 [BepInDependency("me.loaforc.facilitymeltdown")]
 [BepInDependency("xxxstoner420bongmasterxxx.open_monitors",BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("ShaosilGaming.GeneralImprovement", BepInDependency.DependencyFlags.SoftDependency)]
 public class ShipMeltdown : BaseUnityPlugin
 {
     internal const string modGUID = "catragryff.ShipMeltdown";
@@ -20,7 +24,8 @@ public class ShipMeltdown : BaseUnityPlugin
 
     private readonly Harmony harmony = new Harmony(modGUID);
     internal static ShipMeltdown instance;
-    internal static bool openMonitorSupport;
+    private static bool openMonitorSupport;
+    private static bool generalImprovementsSupport;
     
     public static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modName);
     
@@ -32,6 +37,7 @@ public class ShipMeltdown : BaseUnityPlugin
         ShipMeltdownConfig = new Config(Config);
 
         openMonitorSupport = Chainloader.PluginInfos.Keys.Contains("xxxstoner420bongmasterxxx.open_monitors");
+        generalImprovementsSupport = Chainloader.PluginInfos.Keys.Contains("ShaosilGaming.GeneralImprovement");
         harmony.PatchAll(typeof(StartOfRoundPatch));
         harmony.PatchAll(typeof(MeltdownHandlerPatch));
         
@@ -45,6 +51,15 @@ public class ShipMeltdown : BaseUnityPlugin
             LifeSupportMonitorPatch.act ??= new ControlledTask((() => { LifeSupportMonitor.Instance.GetComponent<TextMeshProUGUI>().enabled = LifeSupportMonitorPatch.meshEnable; }),
                 true);
             LifeSupportMonitorPatch.meshEnable = true;
+            ShipPanic.mc = new OpenMonitor();
+        }
+        else if (generalImprovementsSupport)
+        {
+            ShipPanic.mc = new GeneralImprovement();
+        }
+        else
+        {
+            ShipPanic.mc = new VanillaMonitor();
         }
         
         StartOfRoundPatch.failure = new DialogueSegment[1];

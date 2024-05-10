@@ -1,4 +1,4 @@
-﻿namespace ShipMeltdown;
+﻿namespace ShipMeltdown.Utils;
 
 // Purpose of this class is to allow actions placed in the main Update loop to be performed only once
 // instead of being called every frame

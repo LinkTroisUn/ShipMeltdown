@@ -48,7 +48,7 @@ public class MeltdownHandlerPatch
         if (ShipPanic.meltdownTimer <= 30f)
         {
             ShipPanic.KillSystems.Run();
-            ShipPanic.MaintainScreenOff.Run();
+            ShipPanic.maintainScreeOff.Run();
         }
 
         // if enabled in config and waited long enough then make the shipdoor panic

@@ -5,6 +5,7 @@ using FacilityMeltdown.API;
 // using FacilityMeltdown.MeltdownSequence.Behaviours;
 using HarmonyLib;
 using ShipMeltdown.Patches;
+using ShipMeltdown.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,10 +23,11 @@ internal static class ShipPanic
     internal static bool canTakeOff = true;
     internal static float meltdownTimer;              // Time remaining before meltdown
     internal static ControlledTask KillSystems;
-    internal static ControlledTask MaintainScreenOff;
     internal static ControlledTask BreakLever;
     internal static ControlledTask takeOff;
+    internal static ControlledTask maintainScreeOff;
     internal static bool OnlyLights;
+    internal static MonitorCompatibility mc;
     
     public static bool CanTakeOff => canTakeOff;
 
@@ -36,13 +38,12 @@ internal static class ShipPanic
     {
        KillSystems  ??= new ControlledTask(MostSystemsDead, true);
        BreakLever ??= new ControlledTask(ShipCantTakeOff, true);
-       MaintainScreenOff ??=
-           new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
        takeOff ??= new ControlledTask(() => { ShipPanic.canTakeOff = true; 
            StartOfRound.Instance.shipHasLanded = false;
            StartOfRound.Instance.shipIsLeaving = true;
            StartOfRound.Instance.shipAnimator.ResetTrigger("ShipLeave");
            StartOfRound.Instance.shipAnimator.SetTrigger("ShipLeave");}, true);
+       maintainScreeOff ??=  new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
        meltdownTimer = 120f; // Changing the meltdown duration in FacilityMeltdown config will sure break things
        delta = 0f;
        delta2 = 0f;
@@ -117,7 +118,7 @@ internal static class ShipPanic
 
     // Only purpose of that function is to prevent the mod from breaking the game if for some reason, a conflict with
     // another mod makes the Action action fail to run
-    private static void TryWithoutNullpo(Action action)
+    internal static void TryWithoutNullpo(Action action)
     {
         try {action.Invoke();} catch (NullReferenceException e){}
     }
@@ -126,59 +127,8 @@ internal static class ShipPanic
     // Force shutdown as many screens as possible
     private static void MostSystemsDead()
     {
-        if (ShipMeltdown.openMonitorSupport)
-            MostSystemsDeadWithMonitors();
-        else
-            MostSystemsDeadWithoutMonitors();
-    }
-
-    private static void MostSystemsDeadWithoutMonitors()
-    {
-         h.hydraulicsDisplay.SetActive(false); 
-            TryWithoutNullpo((() => {StartOfRound.Instance.deadlineMonitorText.enabled = false;}));
-            TryWithoutNullpo((() => {StartOfRound.Instance.deadlineMonitorBGImage.enabled = false;}));
-            TryWithoutNullpo((() => {StartOfRound.Instance.profitQuotaMonitorText.enabled = false;}));
-            TryWithoutNullpo((() => {StartOfRound.Instance.profitQuotaMonitorBGImage.enabled = false;}));
-    }
-   
-    private static void MostSystemsDeadWithMonitors()
-    {
         h.hydraulicsDisplay.SetActive(false);
-        
-        if (!OpenMonitors.Monitors.Config.HideCredits.Value)
-        {
-            CreditsMonitorPatch.meshEnable = false;
-            OpenMonitors.Monitors.CreditsMonitor.Instance.UpdateMonitor();
-        }
-
-        if (!OpenMonitors.Monitors.Config.HideLifeSupport.Value)
-        {
-            LifeSupportMonitorPatch.meshEnable = false;
-            OpenMonitors.Monitors.LifeSupportMonitor.Instance.UpdateMonitor();
-        }
-            
-        if (OpenMonitors.Monitors.Config.KeepBlueBackground2.Value)
-            StartOfRound.Instance.deadlineMonitorBGImage.enabled = false;
-        if (OpenMonitors.Monitors.Config.KeepBlueBackground1.Value)
-            StartOfRound.Instance.profitQuotaMonitorBGImage.enabled = false;
-            
-        StartOfRound.Instance.deadlineMonitorText.enabled = false;
-        StartOfRound.Instance.profitQuotaMonitorText.enabled = false;
-
-        if (!OpenMonitors.Monitors.Config.HideDay.Value)
-            OpenMonitors.Monitors.DayMonitor.Instance.textMesh.enabled = false;
-
-        if (!OpenMonitors.Monitors.Config.HideLoot.Value)
-            OpenMonitors.Monitors.LootMonitor.Instance.textMesh.enabled = false;
-
-        if (!OpenMonitors.Monitors.Config.HideTime.Value)
-            OpenMonitors.Monitors.TimeMonitor.Instance.textMesh.enabled = false;
-
-        if (!OpenMonitors.Monitors.Config.HideLifeSupport.Value)
-            OpenMonitors.Monitors.LifeSupportMonitor.Instance.enabled = false;
-
-        if (!OpenMonitors.Monitors.Config.HidePlayersLifeSupport.Value)
-            OpenMonitors.Monitors.PlayersLifeSupportMonitor.Instance.textMesh.enabled = false;
+        mc.MostSystemsDead();
     }
 
     // When reaching Low Moon Orbit, re-activate the systems that might have been disabled (and stop trying to force them to die)
@@ -188,13 +138,8 @@ internal static class ShipPanic
         
         KillSystems.Reset();
         BreakLever.Reset();
-        MaintainScreenOff.Reset();
+        maintainScreeOff.Reset();
         takeOff.Reset();
-        
-        if (ShipMeltdown.openMonitorSupport)
-            ReviveSystemsWithMonitors();
-        else
-            ReviveSystemsWithoutMonitors();
         
         canTakeOff = true;
         
@@ -208,59 +153,10 @@ internal static class ShipPanic
         }
 
         toggleGroup.Clear();
+        
+        mc.ReviveSystems();
 
         if (repeat)
             h.shipDoorsAnimator.SetBool("Closed", true);
-    }
-
-    //
-    private static void ReviveSystemsWithoutMonitors()
-    {
-        TryWithoutNullpo((() => {StartOfRound.Instance.deadlineMonitorText.enabled = true;}));
-        TryWithoutNullpo((() => {StartOfRound.Instance.deadlineMonitorBGImage.enabled = true;}));
-        TryWithoutNullpo((() => {StartOfRound.Instance.profitQuotaMonitorText.enabled = true;}));
-        TryWithoutNullpo((() => {StartOfRound.Instance.profitQuotaMonitorBGImage.enabled = true;}));
-    }
-
-    private static void ReviveSystemsWithMonitors()
-    { 
-        if (!OpenMonitors.Monitors.Config.HideCredits.Value)
-        {
-            CreditsMonitorPatch.meshEnable = true;
-            OpenMonitors.Monitors.CreditsMonitor.Instance.UpdateMonitor();
-        }
-            
-            
-        if (!OpenMonitors.Monitors.Config.HideLifeSupport.Value)
-        {
-            LifeSupportMonitorPatch.meshEnable = true;
-            OpenMonitors.Monitors.LifeSupportMonitor.Instance.UpdateMonitor();
-        }
-            
-        if (OpenMonitors.Monitors.Config.KeepBlueBackground2.Value)
-            StartOfRound.Instance.deadlineMonitorBGImage.enabled = true;
-        if (OpenMonitors.Monitors.Config.KeepBlueBackground1.Value)
-            StartOfRound.Instance.profitQuotaMonitorBGImage.enabled = true;
-            
-        StartOfRound.Instance.deadlineMonitorText.enabled = true;
-        StartOfRound.Instance.profitQuotaMonitorText.enabled = true;
-
-        if (!OpenMonitors.Monitors.Config.HideCredits.Value)
-            OpenMonitors.Monitors.CreditsMonitor.Instance.enabled = true;
-
-        if (!OpenMonitors.Monitors.Config.HideDay.Value)
-            OpenMonitors.Monitors.DayMonitor.Instance.textMesh.enabled = true;
-
-        if (!OpenMonitors.Monitors.Config.HideLoot.Value)
-            OpenMonitors.Monitors.LootMonitor.Instance.textMesh.enabled = true;
-
-        if (!OpenMonitors.Monitors.Config.HideTime.Value)
-            OpenMonitors.Monitors.TimeMonitor.Instance.textMesh.enabled  = true;
-
-        if (!OpenMonitors.Monitors.Config.HideLifeSupport.Value)
-            OpenMonitors.Monitors.LifeSupportMonitor.Instance.enabled = true;
-
-        if (!OpenMonitors.Monitors.Config.HidePlayersLifeSupport.Value)
-            OpenMonitors.Monitors.PlayersLifeSupportMonitor.Instance.textMesh.enabled = true;
     }
 }

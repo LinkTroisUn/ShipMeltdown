@@ -29,6 +29,9 @@
         <Reference Include="OpenMonitors">
             <HintPath>libs\OpenMonitors.dll</HintPath>
         </Reference>
+        <Reference Include="GeneralImprovements">
+            <HintPath>libs\GeneralImprovements.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>
