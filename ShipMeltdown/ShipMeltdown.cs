@@ -20,7 +20,7 @@ public class ShipMeltdown : BaseUnityPlugin
 {
     internal const string modGUID = "catragryff.ShipMeltdown";
     internal const string modName = "ShipMeltdown";
-    internal const string modVersion = "1.5.50";
+    internal const string modVersion = "1.6.50";
 
     internal readonly Harmony harmony = new Harmony(modGUID);
     internal static ShipMeltdown instance;
