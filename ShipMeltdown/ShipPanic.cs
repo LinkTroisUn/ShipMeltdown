@@ -25,7 +25,6 @@ internal static class ShipPanic
     internal static ControlledTask KillSystems;
     internal static ControlledTask BreakLever;
     internal static ControlledTask takeOff;
-    internal static ControlledTask maintainScreeOff;
     internal static bool OnlyLights;
     internal static MonitorCompatibility mc;
     
@@ -38,12 +37,14 @@ internal static class ShipPanic
     {
        KillSystems  ??= new ControlledTask(MostSystemsDead, true);
        BreakLever ??= new ControlledTask(ShipCantTakeOff, true);
-       takeOff ??= new ControlledTask(() => { ShipPanic.canTakeOff = true; 
+       takeOff ??= new ControlledTask(() =>
+       {
+           ShipPanic.canTakeOff = true;
            StartOfRound.Instance.shipHasLanded = false;
            StartOfRound.Instance.shipIsLeaving = true;
            StartOfRound.Instance.shipAnimator.ResetTrigger("ShipLeave");
-           StartOfRound.Instance.shipAnimator.SetTrigger("ShipLeave");}, true);
-       maintainScreeOff ??=  new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
+           StartOfRound.Instance.shipAnimator.SetTrigger("ShipLeave");
+       }, true);
        meltdownTimer = 120f; // Changing the meltdown duration in FacilityMeltdown config will sure break things
        delta = 0f;
        delta2 = 0f;
@@ -118,7 +119,7 @@ internal static class ShipPanic
 
     // Only purpose of that function is to prevent the mod from breaking the game if for some reason, a conflict with
     // another mod makes the Action action fail to run
-    internal static void TryWithoutNullpo(Action action)
+    internal static void TryWithoutNullPo(Action action)
     {
         try {action.Invoke();} catch (NullReferenceException e){}
     }
@@ -138,7 +139,7 @@ internal static class ShipPanic
         
         KillSystems.Reset();
         BreakLever.Reset();
-        maintainScreeOff.Reset();
+        mc.MaintainScreenOff().Reset();
         takeOff.Reset();
         
         canTakeOff = true;

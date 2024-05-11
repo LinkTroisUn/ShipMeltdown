@@ -4,6 +4,11 @@ namespace ShipMeltdown.Utils.Monitors;
 
 public class OpenMonitor : MonitorCompatibility
 {
+    private ControlledTask maintainScreenOff = new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
+    public ControlledTask MaintainScreenOff()
+    {
+        return maintainScreenOff;
+    }
 
     public void MostSystemsDead()
     {

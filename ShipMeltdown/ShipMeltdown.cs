@@ -15,7 +15,7 @@ namespace ShipMeltdown;
 [BepInPlugin(modGUID, modName, modVersion)]
 [BepInDependency("me.loaforc.facilitymeltdown")]
 [BepInDependency("xxxstoner420bongmasterxxx.open_monitors",BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("ShaosilGaming.GeneralImprovement", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("ShaosilGaming.GeneralImprovements", BepInDependency.DependencyFlags.SoftDependency)]
 public class ShipMeltdown : BaseUnityPlugin
 {
     internal const string modGUID = "catragryff.ShipMeltdown";
@@ -37,7 +37,7 @@ public class ShipMeltdown : BaseUnityPlugin
         ShipMeltdownConfig = new Config(Config);
 
         openMonitorSupport = Chainloader.PluginInfos.Keys.Contains("xxxstoner420bongmasterxxx.open_monitors");
-        generalImprovementsSupport = Chainloader.PluginInfos.Keys.Contains("ShaosilGaming.GeneralImprovement");
+        generalImprovementsSupport = Chainloader.PluginInfos.Keys.Contains("ShaosilGaming.GeneralImprovements");
         harmony.PatchAll(typeof(StartOfRoundPatch));
         harmony.PatchAll(typeof(MeltdownHandlerPatch));
         
@@ -52,14 +52,17 @@ public class ShipMeltdown : BaseUnityPlugin
                 true);
             LifeSupportMonitorPatch.meshEnable = true;
             ShipPanic.mc = new OpenMonitor();
+            mls.LogInfo("Adding OpenMonitor support");
         }
         else if (generalImprovementsSupport)
         {
             ShipPanic.mc = new GeneralImprovement();
+            mls.LogInfo("Adding GeneralImprovements support");
         }
         else
         {
             ShipPanic.mc = new VanillaMonitor();
+            mls.LogInfo("No monitor support were added");
         }
         
         StartOfRoundPatch.failure = new DialogueSegment[1];
