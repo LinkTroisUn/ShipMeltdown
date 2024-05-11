@@ -22,7 +22,7 @@ public class ShipMeltdown : BaseUnityPlugin
     internal const string modName = "ShipMeltdown";
     internal const string modVersion = "1.5.50";
 
-    private readonly Harmony harmony = new Harmony(modGUID);
+    internal readonly Harmony harmony = new Harmony(modGUID);
     internal static ShipMeltdown instance;
     private static bool openMonitorSupport;
     private static bool generalImprovementsSupport;
@@ -33,6 +33,9 @@ public class ShipMeltdown : BaseUnityPlugin
     
     public void Awake()
     {
+        if (instance == null)
+            instance = this;
+        
         mls.LogInfo("ShipMeltdown loading...");
         ShipMeltdownConfig = new Config(Config);
 
@@ -41,28 +44,22 @@ public class ShipMeltdown : BaseUnityPlugin
         harmony.PatchAll(typeof(StartOfRoundPatch));
         harmony.PatchAll(typeof(MeltdownHandlerPatch));
         
+        if (generalImprovementsSupport)
+        {
+            mls.LogInfo("Adding GeneralImprovements support");
+            MonitorCompatibilityHandler.AddMonitorCompatibilityHandler(new Utils.Monitors.GeneralImprovements());
+        }
+        
         if (openMonitorSupport)
         {
-            harmony.PatchAll(typeof(CreditsMonitorPatch));
-            harmony.PatchAll(typeof(LifeSupportMonitorPatch));
-            CreditsMonitorPatch.act ??= new ControlledTask((() => { CreditsMonitor.Instance.GetComponent<TextMeshProUGUI>().enabled = CreditsMonitorPatch.meshEnable; }),
-                true);
-            CreditsMonitorPatch.meshEnable = true;
-            LifeSupportMonitorPatch.act ??= new ControlledTask((() => { LifeSupportMonitor.Instance.GetComponent<TextMeshProUGUI>().enabled = LifeSupportMonitorPatch.meshEnable; }),
-                true);
-            LifeSupportMonitorPatch.meshEnable = true;
-            ShipPanic.mc = new OpenMonitor();
             mls.LogInfo("Adding OpenMonitor support");
+            MonitorCompatibilityHandler.AddMonitorCompatibilityHandler(new OpenMonitor());
         }
-        else if (generalImprovementsSupport)
+        
+        if (!(openMonitorSupport || generalImprovementsSupport))
         {
-            ShipPanic.mc = new GeneralImprovement();
-            mls.LogInfo("Adding GeneralImprovements support");
-        }
-        else
-        {
-            ShipPanic.mc = new VanillaMonitor();
-            mls.LogInfo("No monitor support were added");
+            mls.LogInfo("No monitor support were added. Adding the default one");
+            MonitorCompatibilityHandler.AddMonitorCompatibilityHandler(new DefaultMonitor(), false);
         }
         
         StartOfRoundPatch.failure = new DialogueSegment[1];

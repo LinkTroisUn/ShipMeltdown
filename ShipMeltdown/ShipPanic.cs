@@ -26,7 +26,6 @@ internal static class ShipPanic
     internal static ControlledTask BreakLever;
     internal static ControlledTask takeOff;
     internal static bool OnlyLights;
-    internal static MonitorCompatibility mc;
     
     public static bool CanTakeOff => canTakeOff;
 
@@ -129,7 +128,7 @@ internal static class ShipPanic
     private static void MostSystemsDead()
     {
         h.hydraulicsDisplay.SetActive(false);
-        mc.MostSystemsDead();
+        MonitorCompatibilityHandler.MostSystemsDead();
     }
 
     // When reaching Low Moon Orbit, re-activate the systems that might have been disabled (and stop trying to force them to die)
@@ -139,7 +138,7 @@ internal static class ShipPanic
         
         KillSystems.Reset();
         BreakLever.Reset();
-        mc.MaintainScreenOff().Reset();
+        MonitorCompatibilityHandler.MaintainScreenOffReset();
         takeOff.Reset();
         
         canTakeOff = true;
@@ -155,7 +154,7 @@ internal static class ShipPanic
 
         toggleGroup.Clear();
         
-        mc.ReviveSystems();
+        MonitorCompatibilityHandler.ReviveSystems();
 
         if (repeat)
             h.shipDoorsAnimator.SetBool("Closed", true);

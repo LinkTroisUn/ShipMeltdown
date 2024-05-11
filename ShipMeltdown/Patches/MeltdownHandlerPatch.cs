@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using FacilityMeltdown;
 using FacilityMeltdown.MeltdownSequence.Behaviours;
 using HarmonyLib;
+using ShipMeltdown.Utils;
 using UnityEngine;
 
 namespace ShipMeltdown.Patches;
@@ -48,7 +49,7 @@ public class MeltdownHandlerPatch
         if (ShipPanic.meltdownTimer <= 30f)
         {
             ShipPanic.KillSystems.Run();
-            ShipPanic.mc.MaintainScreenOff().Run();
+            MonitorCompatibilityHandler.MaintainScreenOff();
         }
 
         // if enabled in config and waited long enough then make the shipdoor panic

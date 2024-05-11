@@ -5,7 +5,7 @@ namespace ShipMeltdown;
 
 public class Config
 {
-    internal static Config Instance;
+    internal static Config? Instance;
 
     internal ConfigEntry<Key> toggleEmergencyLights;
 

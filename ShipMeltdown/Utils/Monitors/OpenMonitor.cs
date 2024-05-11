@@ -1,10 +1,25 @@
-﻿using ShipMeltdown.Patches;
+﻿using OpenMonitors.Monitors;
+using ShipMeltdown.Patches;
+using TMPro;
 
 namespace ShipMeltdown.Utils.Monitors;
 
 public class OpenMonitor : MonitorCompatibility
 {
     private ControlledTask maintainScreenOff = new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
+
+    public OpenMonitor()
+    {
+        ShipMeltdown.instance.harmony.PatchAll(typeof(CreditsMonitorPatch));
+        ShipMeltdown.instance.harmony.PatchAll(typeof(LifeSupportMonitorPatch));
+        CreditsMonitorPatch.act ??= new ControlledTask((() => { CreditsMonitor.Instance.GetComponent<TextMeshProUGUI>().enabled = CreditsMonitorPatch.meshEnable; }),
+            true);
+        CreditsMonitorPatch.meshEnable = true;
+        LifeSupportMonitorPatch.act ??= new ControlledTask((() => { LifeSupportMonitor.Instance.GetComponent<TextMeshProUGUI>().enabled = LifeSupportMonitorPatch.meshEnable; }),
+            true);
+        LifeSupportMonitorPatch.meshEnable = true;
+    }
+    
     public ControlledTask MaintainScreenOff()
     {
         return maintainScreenOff;

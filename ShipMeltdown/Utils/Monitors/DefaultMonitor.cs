@@ -1,6 +1,6 @@
 ﻿namespace ShipMeltdown.Utils.Monitors;
 
-public class VanillaMonitor : MonitorCompatibility
+public class DefaultMonitor : MonitorCompatibility
 {
     private ControlledTask maintainScreenOff = new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
     public ControlledTask MaintainScreenOff()

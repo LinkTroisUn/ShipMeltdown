@@ -12,7 +12,7 @@ public class CreditsMonitorPatch
 {
     internal static bool meshEnable = true;
 
-    internal static ControlledTask act;
+    internal static ControlledTask? act;
 
     [HarmonyPrefix, HarmonyPatch("UpdateMonitor")]
     private static bool UpdatePatch()
@@ -38,7 +38,7 @@ public class LifeSupportMonitorPatch
 {
     internal static bool meshEnable = true;
 
-    internal static ControlledTask act;
+    internal static ControlledTask? act;
 
     [HarmonyPrefix, HarmonyPatch("UpdateMonitor")]
     private static bool UpdatePatch()
