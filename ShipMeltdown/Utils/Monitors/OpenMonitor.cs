@@ -8,7 +8,7 @@ public class OpenMonitor : MonitorCompatibility
 {
     private ControlledTask maintainScreenOff = new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
 
-    public OpenMonitor()
+    internal OpenMonitor()
     {
         ShipMeltdown.instance.harmony.PatchAll(typeof(CreditsMonitorPatch));
         ShipMeltdown.instance.harmony.PatchAll(typeof(LifeSupportMonitorPatch));

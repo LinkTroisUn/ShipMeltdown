@@ -27,7 +27,7 @@ public class ShipMeltdown : BaseUnityPlugin
     private static bool openMonitorSupport;
     private static bool generalImprovementsSupport;
     
-    public static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modName);
+    internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(modName);
     
     public static Config ShipMeltdownConfig { get; private set; }
     

@@ -8,8 +8,10 @@ public class Config
     internal static Config? Instance;
 
     internal ConfigEntry<Key> toggleEmergencyLights;
+    public Key getToggleEmergencyLights => toggleEmergencyLights.Value;
 
     internal ConfigEntry<bool> shipDoorMalfunction;
+    public bool getShipDoorMalfunction => shipDoorMalfunction.Value;
     
     public Config(ConfigFile file)
     {

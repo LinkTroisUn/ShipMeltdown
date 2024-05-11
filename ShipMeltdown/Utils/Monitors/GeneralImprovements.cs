@@ -13,7 +13,7 @@ public class GeneralImprovements : MonitorCompatibility
     internal static Queue<ManualCameraRenderer> monitors_cameras;
     internal static Queue<MeshRenderer> monitors_mesh;
 
-    public GeneralImprovements()
+    internal GeneralImprovements()
     {
         ShipMeltdown.instance.harmony.PatchAll(typeof(StartOfRoundGeneralPatch));
         ShipMeltdown.instance.harmony.PatchAll(typeof(MonitorsHelperPatch));

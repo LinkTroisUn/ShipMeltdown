@@ -2,6 +2,8 @@
 
 public class DefaultMonitor : MonitorCompatibility
 {
+    internal DefaultMonitor(){}
+    
     private ControlledTask maintainScreenOff = new ControlledTask(() => StartOfRound.Instance.mapScreen.SwitchScreenOn(false), false);
     public ControlledTask MaintainScreenOff()
     {

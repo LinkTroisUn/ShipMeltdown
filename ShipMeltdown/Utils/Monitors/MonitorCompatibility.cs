@@ -8,12 +8,12 @@ public interface MonitorCompatibility
     // of your MonitorCompatibility implementation
     
     // Called just after MostSystemsDead(). Fill with something if you need to enforce something every frame
-    internal ControlledTask MaintainScreenOff();
+    public ControlledTask MaintainScreenOff();
     
     // Called at T-30s before explosion. Activates the effects
-    internal void MostSystemsDead();
+    public void MostSystemsDead();
     
     // Called during meltdown onDisable(). Revert everything you have altered to its original state (if required)
-    internal void ReviveSystems();
+    public void ReviveSystems();
 
 }
