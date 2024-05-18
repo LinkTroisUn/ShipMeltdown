@@ -30,7 +30,7 @@ internal static class StartOfRoundPatch
     {
 
 #if DEBUG // To test the mod without having to enter the facility in search of the apparatus
-        if (Keyboard.current.f7Key.wasPressedThisFrame || Keyboard.current.f8Key.isPressed)
+        if (Keyboard.current.f7Key.wasPressedThisFrame || Keyboard.current.f7Key.isPressed)
         {
             FacilityMeltdown.API.MeltdownAPI.StartMeltdown(ShipMeltdown.modGUID);
         }
