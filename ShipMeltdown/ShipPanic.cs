@@ -20,6 +20,7 @@ internal static class ShipPanic
     internal static HangarShipDoor h;
     internal static Queue<(Light, Color)> colors;      // Initial color of lights,
     internal static Queue<(Light, bool)> toggleGroup; // Initial activation state of lights
+    private static HashSet<Light> affected;
     internal static bool canTakeOff = true;
     internal static float meltdownTimer;              // Time remaining before meltdown
     internal static ControlledTask KillSystems;
@@ -69,6 +70,7 @@ internal static class ShipPanic
         StartOfRound shipManager = StartOfRound.Instance;
         colors ??= new Queue<(Light, Color)>();
         toggleGroup ??= new Queue<(Light, bool)>();
+        affected ??= new HashSet<Light>();
         
         while (colors.Count > 0)
         {
@@ -89,6 +91,9 @@ internal static class ShipPanic
         Light[] interior = shipManager.shipRoomLights.GetComponentsInChildren<Light>();
         foreach (Light l in shipManager.shipAnimator.GetComponentsInChildren<Light>())
         {
+            if (!affected.Add(l))
+                continue;
+            
             colors.Enqueue((l, l.color));
             l.color = Color.red;
             if (!interior.Contains(l))
@@ -154,7 +159,9 @@ internal static class ShipPanic
 
         toggleGroup.Clear();
         
+        affected.Clear();
         MonitorCompatibilityHandler.ReviveSystems();
+        
 
         if (repeat)
             h.shipDoorsAnimator.SetBool("Closed", true);
