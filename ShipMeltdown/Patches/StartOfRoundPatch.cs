@@ -5,12 +5,10 @@ using UnityEngine.InputSystem;
 namespace ShipMeltdown.Patches;
 
 [HarmonyPatch(typeof(StartOfRound))]
-internal static class StartOfRoundPatch
+internal static class StartOfRoundPatch1
 {
     internal static DialogueSegment[] failure; // read around explosion time
-    private static int emergencyType = 1;      // for manual emergency lights toggle
-    internal static float delta = 0f;
-    
+
     // Prevent the ship from taking off when the nuclear explosion occurs (original reason for this mod)
     [HarmonyPrefix, HarmonyPatch("ShipLeave")]
     internal static bool ShipLeavePatch()
@@ -24,6 +22,13 @@ internal static class StartOfRoundPatch
 
         return true;
     }
+}
+
+[HarmonyPatch(typeof(StartOfRound))]
+internal static class StartOfRoundPatch2
+{
+    private static int emergencyType = 1;      // for manual emergency lights toggle
+    private static float delta = 0f;
 
     [HarmonyPostfix, HarmonyPatch("Update")]
     private static void UpdatePatch()

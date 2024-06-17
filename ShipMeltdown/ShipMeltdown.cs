@@ -9,6 +9,7 @@ using ShipMeltdown.Utils;
 using ShipMeltdown.Utils.Monitors;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace ShipMeltdown;
 
@@ -16,6 +17,7 @@ namespace ShipMeltdown;
 [BepInDependency("me.loaforc.facilitymeltdown")]
 [BepInDependency("xxxstoner420bongmasterxxx.open_monitors",BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("ShaosilGaming.GeneralImprovements", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("PizzaProbability", BepInDependency.DependencyFlags.SoftDependency)]
 public class ShipMeltdown : BaseUnityPlugin
 {
     internal const string modGUID = "catragryff.ShipMeltdown";
@@ -41,7 +43,16 @@ public class ShipMeltdown : BaseUnityPlugin
 
         openMonitorSupport = Chainloader.PluginInfos.Keys.Contains("xxxstoner420bongmasterxxx.open_monitors");
         generalImprovementsSupport = Chainloader.PluginInfos.Keys.Contains("ShaosilGaming.GeneralImprovements");
-        harmony.PatchAll(typeof(StartOfRoundPatch));
+
+        if (Chainloader.PluginInfos.Keys.Contains("PizzaProbability"))
+        {
+            mls.LogError("PizzaProbability detected ! This mod is incompatible with ShipMeltdown. Trying to remove PizzaProbability patches to avoid breaking the game...");
+            Harmony.UnpatchID("PizzaProbability");
+        }
+        
+        harmony.PatchAll(typeof(StartOfRoundPatch1));
+        if (ShipMeltdownConfig.getToggleEmergencyLights != Key.None)
+            harmony.PatchAll(typeof(StartOfRoundPatch2));
         harmony.PatchAll(typeof(MeltdownHandlerPatch));
         
         if (generalImprovementsSupport)
@@ -62,8 +73,8 @@ public class ShipMeltdown : BaseUnityPlugin
             MonitorCompatibilityHandler.AddMonitorCompatibilityHandler(new DefaultMonitor(), false);
         }
         
-        StartOfRoundPatch.failure = new DialogueSegment[1];
-        StartOfRoundPatch.failure[0] = new DialogueSegment
+        StartOfRoundPatch1.failure = new DialogueSegment[1];
+        StartOfRoundPatch1.failure[0] = new DialogueSegment
         {
             waitTime = 6f,
             bodyText = "Ship engines not detected. The company warned you not to play with radiations"
