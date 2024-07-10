@@ -13,7 +13,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
         <PackageReference Include="BepInEx.Core" Version="5.4.21" />
-        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="50.0.1-ngd.0" />
+        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="56.0.1-ngd.0" />
         <PackageReference Include="Unity3D.Personal" Version="2019.3.9" />
         <PackageReference Include="UnityEngine.Modules" Version="6000.0.0-beta.15">
           <PrivateAssets>all</PrivateAssets>
@@ -24,7 +24,7 @@
     
     <ItemGroup>
         <Reference Include="Facility.Meltdown">
-            <HintPath>libs\FacilityMeltdown-v50.dll</HintPath>
+            <HintPath>libs\FacilityMeltdown-v55.dll</HintPath>
         </Reference>
         <Reference Include="OpenMonitors">
             <HintPath>libs\OpenMonitors.dll</HintPath>
